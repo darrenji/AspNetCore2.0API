@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using CoreAPI.Services;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace CoreAPI
 {
@@ -15,20 +17,25 @@ namespace CoreAPI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IMovieService, MovieService>();
+            services.AddSingleton<IReviewService, ReviewService>();
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
+            app.UseExceptionHandler(configure => {
+                configure.Run(async context => {
+                    var ex = context.Features
+                        .Get<IExceptionHandlerFeature>()
+                        .Error;
+                    context.Response.StatusCode = 500;
+                    await context.Response.WriteAsync($"{ex.Message}");
+                });
             });
+
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
