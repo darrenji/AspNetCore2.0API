@@ -7,7 +7,6 @@ namespace CoreAPI.Models
 {
     public class MovieOutputModel
     {
-        public int Count { get; set; }
         public List<MovieInfo> Items { get; set; }
     }
 

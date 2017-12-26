@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using CoreAPI.Models;
 using CoreAPI.Services;
+using CoreAPI.Models;
 using CoreAPI.Lib;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,15 +20,13 @@ namespace CoreAPI.Controllers
         {
             this.service = service;
         }
-        
-        [HttpGet(Name = "GetMovies")]
-        public IActionResult Get(FilteringParams filteringParams)
-        {
-            var model = service.GetMovies(filteringParams);
 
+        [HttpGet(Name = "GetMovies")]
+        public IActionResult Get(SortingParams sortingParams)
+        {
+            var model = service.GetMovies(sortingParams);
             var outputModel = new MovieOutputModel
             {
-                Count = model.Count,
                 Items = model.Select(m => ToMovieInfo(m)).ToList()
             };
             return Ok(outputModel);
@@ -47,4 +45,6 @@ namespace CoreAPI.Controllers
             };
         }
     }
+
+   
 }

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace CoreAPI.Lib
 {
-    public class FilteringParams
+    public class SortingParams
     {
-        public string FilterBy { get; set; } = "";
+        public string SortBy { get; set; } = "";
     }
 }
