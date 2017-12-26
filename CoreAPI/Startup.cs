@@ -12,7 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.Versioning;
-
+using CoreAPI.Service;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace CoreAPI
 {
@@ -22,8 +23,16 @@ namespace CoreAPI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IMovieService, MovieService>();
 
-            services.AddMvc();
+            services.AddMvc(options => {
+                options.ReturnHttpNotAcceptable = true;
+                options.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
+                options.InputFormatters.Add(new XmlSerializerInputFormatter());
+                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+
+                options.FormatterMappings.SetMediaTypeMappingForFormat("xml", "application/xml");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

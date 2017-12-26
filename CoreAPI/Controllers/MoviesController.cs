@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using CoreAPI.Service;
 using CoreAPI.Models;
-using CoreAPI.Lib;
-using Microsoft.AspNetCore.Http;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,51 +13,67 @@ namespace CoreAPI.Controllers
     [Route("movies")]
     public class MoviesController : Controller
     {
-        const string ETAG_HEADER = "ETag";
-        const string MATCH_HEADER = "If-Match";
+        private readonly IMovieService movieService;
 
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public MoviesController(IMovieService movieService)
         {
-            var model_from_db = new Movie
-            {
-                Id = 1,
-                Title = "title1",
-                ReleaseYear = 1965
-            };
-
-            //每次获取到一个实体就hash，然后放到ETag中
-            var eTag = HashFactory.GetHash(model_from_db);
-            HttpContext.Response.Headers.Add(ETAG_HEADER, eTag);
-
-            if (HttpContext.Request.Headers.ContainsKey(MATCH_HEADER) && HttpContext.Request.Headers[MATCH_HEADER].RemoveQuotes() == eTag)
-                return new StatusCodeResult(StatusCodes.Status304NotModified);
-
-            return Ok(model_from_db);
+            this.movieService = movieService;
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]Movie model)
+        [HttpGet()]
+        [HttpGet("/movies.{format}"), FormatFilter]
+        public IActionResult Get()
         {
-            var model_from_db = new Movie
+            var model = movieService.GetMovies();
+            var outputModel = ToOutputModel(model);
+            return Ok(outputModel);
+        }
+
+        [HttpGet("{id}", Name = "GetMovie")]
+        public IActionResult Get(int id)
+        {
+            var model = movieService.GetMovie(id);
+            var outputModel = ToOutputModel(model);
+            return Ok(outputModel);
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody]MovieInputModel inputModel)
+        {
+            var model = ToDomainModel(inputModel);
+            movieService.AddMovie(model);
+
+            var outputModel = ToOutputModel(model);
+            return CreatedAtRoute("GetMovie", new { id=outputModel.Id}, outputModel);
+        }
+
+        private MovieOutputModel ToOutputModel(Movie model)
+        {
+            if (model == null) return null;
+            return new MovieOutputModel
             {
-                Id = 1,
-                Title = "title1-changed",
-                ReleaseYear = 1965
+                Id = model.Id,
+                Title = model.Title,
+                ReleaseYear = model.ReleaseYear,
+                Summary = model.Summary,
+                LastReadAt = DateTime.Now
             };
+        }
 
-            var eTag = HashFactory.GetHash(model_from_db);
-            HttpContext.Response.Headers.Add(ETAG_HEADER, eTag);
+        private List<MovieOutputModel> ToOutputModel(List<Movie> model)
+        {
+            return model.Select(item => ToOutputModel(item)).ToList();
+        }
 
-            if(!HttpContext.Request.Headers.ContainsKey(MATCH_HEADER) || HttpContext.Request.Headers[MATCH_HEADER].RemoveQuotes()!=eTag)
+        private Movie ToDomainModel(MovieInputModel inputModel)
+        {
+            return new Movie
             {
-                return new StatusCodeResult(StatusCodes.Status412PreconditionFailed);
-            }
-            else
-            {
-                //saving should be ok
-            }
-            return NoContent();
+                Id = inputModel.Id,
+                Title = inputModel.Title,
+                ReleaseYear = inputModel.ReleaseYear,
+                Summary = inputModel.Summary
+            };
         }
     }
 }
