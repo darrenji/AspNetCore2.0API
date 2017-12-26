@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreAPI.Lib;
 
 namespace CoreAPI.Services
 {
@@ -13,24 +14,27 @@ namespace CoreAPI.Services
         {
             this.movies = new List<Movie>
             {
-                new Movie{Id=1, Title="never say never again", ReleaseYear=1983, Summary="a pecture agent"},
-                new Movie{Id=2, Title="diamonds are forever", ReleaseYear=1971, Summary="a diamond smuggling"},
-                new Movie{Id=3, Title="you only live twice", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=4, Title="you only live twice4", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=5, Title="you only live twice5", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=6, Title="you only live twice6", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=7, Title="you only live twice7", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=8, Title="you only live twice8", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=9, Title="you only live twice9", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=10, Title="you only live twice10", ReleaseYear=1967, Summary="agent 007 and the"},
-                new Movie{Id=11, Title="you only live twice11", ReleaseYear=1967, Summary="agent 007 and the"}
+                new Movie{Id=1, LeadActor="d", Title="heelo", ReleaseYear=1982, Summary="good"},
+                new Movie{Id=2, LeadActor="a", Title="a", ReleaseYear=1982, Summary="aaa"},
+                new Movie{Id=3, LeadActor="c", Title="c", ReleaseYear=1982, Summary="ccc"},
+                new Movie{Id=4, LeadActor="d", Title="d", ReleaseYear=1982, Summary="ddd"},
+                new Movie{Id=5, LeadActor="e", Title="ee", ReleaseYear=1982, Summary="eee"},
+                new Movie{Id=6, LeadActor="f", Title="ff", ReleaseYear=1982, Summary="fff"}
             };
         }
-
-        public PagedList<Movie> GetMovies(PagingParams pagingParams)
+        public List<Movie> GetMovies(FilteringParams filteringParams)
         {
             var query = this.movies.AsQueryable();
-            return new PagedList<Movie>(query, pagingParams.PageNumber, pagingParams.PageSize);
+
+            var filterBy = filteringParams.FilterBy.Trim().ToLowerInvariant();
+            if(!string.IsNullOrEmpty(filterBy))
+            {
+                query = query
+                    .Where(t => t.LeadActor.ToLowerInvariant().Contains(filterBy)
+                    || t.Title.ToLowerInvariant().Contains(filterBy)
+                    || t.Summary.ToLowerInvariant().Contains(filterBy));
+            }
+            return query.ToList();
         }
     }
 }
