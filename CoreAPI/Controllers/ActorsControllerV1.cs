@@ -8,23 +8,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CoreAPI.Controllers
 {
-    // via query string
-    // e.g. /movies?api-version=2.0
+    // via url
+    // e.g. actors/v2.0
 
     [ApiVersion("1.0")]
-    [Route("movies")]
-    public class MoviesControllerV1:Controller
+    [Route("actors/v{ver:apiVersion}")]
+    public class ActorsControllerV1 : Controller
     {
         [HttpGet]
-        public IActionResult Get() => Content("movie version1");
+        public IActionResult Get() => Content("version1");
     }
 
-    //这里没有成功
     [ApiVersion("2.0")]
-    [Route("movies")]
-    public class MoviesControllerV2 : Controller
+    [Route("actors/v{ver:apiVersion}")]
+    public class ActorsControllerV2 : Controller
     {
         [HttpGet]
-        public IActionResult Get() => Content("movie version2");
+        public IActionResult Get() => Content("version2");
     }
 }
