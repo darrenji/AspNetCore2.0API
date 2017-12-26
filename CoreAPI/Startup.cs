@@ -25,10 +25,6 @@ namespace CoreAPI
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info { Title = "Contacts API", Version = "v1" });
-            });
 
 
             services.AddMvc();
@@ -39,11 +35,7 @@ namespace CoreAPI
         {
             app.UseDeveloperExceptionPage();
             app.UseMvcWithDefaultRoute();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contacts API V1");
-            });
+
         }
     }
 }
