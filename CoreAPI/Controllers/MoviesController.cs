@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using CoreAPI.Service;
 using CoreAPI.Models;
+using Microsoft.AspNetCore.JsonPatch;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,67 +13,45 @@ namespace CoreAPI.Controllers
     [Route("movies")]
     public class MoviesController : Controller
     {
-        private readonly IMovieService movieService;
-
-        public MoviesController(IMovieService movieService)
-        {
-            this.movieService = movieService;
-        }
-
-        [HttpGet()]
-        [HttpGet("/movies.{format}"), FormatFilter]
+        [HttpGet]
         public IActionResult Get()
         {
-            var model = movieService.GetMovies();
-            var outputModel = ToOutputModel(model);
+            var outputModel = new List<MovieOutputModel>();
             return Ok(outputModel);
         }
 
         [HttpGet("{id}", Name = "GetMovie")]
         public IActionResult Get(int id)
         {
-            var model = movieService.GetMovie(id);
-            var outputModel = ToOutputModel(model);
+            var outputModel = new MovieOutputModel();
             return Ok(outputModel);
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(MovieOutputModel), 201)]
+        [Produces("application/json",Type = typeof(MovieOutputModel))]
         public IActionResult Create([FromBody]MovieInputModel inputModel)
         {
-            var model = ToDomainModel(inputModel);
-            movieService.AddMovie(model);
-
-            var outputModel = ToOutputModel(model);
-            return CreatedAtRoute("GetMovie", new { id=outputModel.Id}, outputModel);
+            var outputModel = new MovieOutputModel();
+            return CreatedAtRoute("GetMovie",new { id=outputModel.Id}, outputModel);
         }
 
-        private MovieOutputModel ToOutputModel(Movie model)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody]MovieInputModel inputModel)
         {
-            if (model == null) return null;
-            return new MovieOutputModel
-            {
-                Id = model.Id,
-                Title = model.Title,
-                ReleaseYear = model.ReleaseYear,
-                Summary = model.Summary,
-                LastReadAt = DateTime.Now
-            };
+            return NoContent();
         }
 
-        private List<MovieOutputModel> ToOutputModel(List<Movie> model)
+        [HttpPatch("{id}")]
+        public IActionResult UpdatePatch(int id, [FromBody]JsonPatchDocument<MovieInputModel> patch)
         {
-            return model.Select(item => ToOutputModel(item)).ToList();
+            return NoContent();
         }
 
-        private Movie ToDomainModel(MovieInputModel inputModel)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
-            return new Movie
-            {
-                Id = inputModel.Id,
-                Title = inputModel.Title,
-                ReleaseYear = inputModel.ReleaseYear,
-                Summary = inputModel.Summary
-            };
+            return NoContent();
         }
     }
 }
