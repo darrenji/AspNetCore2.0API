@@ -15,42 +15,22 @@ namespace CoreAPI.Services
             {
                 new Movie{Id=1, Title="never say never again", ReleaseYear=1983, Summary="a pecture agent"},
                 new Movie{Id=2, Title="diamonds are forever", ReleaseYear=1971, Summary="a diamond smuggling"},
-                new Movie{Id=3, Title="you only live twice", ReleaseYear=1967, Summary="agent 007 and the"}
+                new Movie{Id=3, Title="you only live twice", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=4, Title="you only live twice4", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=5, Title="you only live twice5", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=6, Title="you only live twice6", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=7, Title="you only live twice7", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=8, Title="you only live twice8", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=9, Title="you only live twice9", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=10, Title="you only live twice10", ReleaseYear=1967, Summary="agent 007 and the"},
+                new Movie{Id=11, Title="you only live twice11", ReleaseYear=1967, Summary="agent 007 and the"}
             };
         }
-        public void AddMovie(Movie item)
-        {
-            this.movies.Add(item);
-        }
 
-        public void DeleteMovie(int id)
+        public PagedList<Movie> GetMovies(PagingParams pagingParams)
         {
-            var model = this.movies.Where(t => t.Id == id).FirstOrDefault();
-            this.movies.Remove(model);
-        }
-
-        public Movie GetMovie(int id)
-        {
-            return this.movies.Where(t => t.Id == id).FirstOrDefault();
-        }
-
-        public List<Movie> GetMovies()
-        {
-            return this.movies.ToList();
-        }
-
-        public bool MovieExists(int id)
-        {
-            return this.movies.Any(t => t.Id == id);
-        }
-
-        public void UpdateMovie(Movie item)
-        {
-            var model = this.movies.Where(t => t.Id == item.Id).FirstOrDefault();
-
-            model.Title = item.Title;
-            model.ReleaseYear = item.ReleaseYear;
-            model.Summary = item.Summary;
+            var query = this.movies.AsQueryable();
+            return new PagedList<Movie>(query, pagingParams.PageNumber, pagingParams.PageSize);
         }
     }
 }

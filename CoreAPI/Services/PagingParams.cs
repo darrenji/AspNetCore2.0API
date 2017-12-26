@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace CoreAPI.Services
 {
-    public interface IMovieService
+    public class PagingParams
     {
-        PagedList<Movie> GetMovies(PagingParams pagingParams);
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 5;
     }
 }
