@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
 using Swashbuckle.AspNetCore.Swagger;
+using CoreAPI.Service;
 
 namespace CoreAPI
 {
@@ -26,7 +27,8 @@ namespace CoreAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-
+            services.AddSingleton<IMovieService, MovieService>();
+            services.AddSingleton<IReviewService, ReviewService>();
             services.AddMvc();
         }
 
